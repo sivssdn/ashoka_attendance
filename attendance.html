@@ -1,0 +1,254 @@
+<!DOCTYPE HTML>
+<html>
+ <head>
+ <title>Attendance</title>
+ <meta name="viewport" content="width=device-width, initial-scale=1.0">
+ <link rel="shortcut icon" type="image/x-icon" href="AshokaFavicon.png" >
+ <style>
+	#cast{
+	background-color:#ffffff;
+	position:fixed;
+	bottom:1%;
+	right:1%;
+	}
+	table{
+	margin:auto;
+	}
+ </style>
+ <!--CSS FOR MATERIAL CARD-->
+ <style>
+ .demo-card-reader.mdl-card{
+  width:98%;
+  height:1vw;
+  margin-left:1%;
+  margin-top:1%;
+  
+ }
+.demo-card-widee.mdl-card {
+  width: 98%;
+  margin-left:1%;
+  margin-top:1%;
+  height:35vw;
+}
+#divuid{
+  width:100%;
+  margin-top:0%;
+  height:4vw;
+  display:block;
+  position:fixed;  
+  clear:both;
+  z-index:10;
+  background-color:#ffffff;
+}
+.mdl-textfield.mdl-js-textfield.uid{
+ display:block;
+ margin:auto;
+}
+
+.material-icons.mdl-list__item-icon.color{
+color:rgba(63,81,181,1);
+}
+</style>
+ 
+ 
+ 
+	<link rel="stylesheet" href="./mdl/material.min.css">
+	<script src="./mdl/material.min.js"></script>
+	<link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+ <!--above three lines are for material design-->
+ </head>
+ 
+ <body onload="document.getElementById('uid').focus();">
+ 
+ 
+ <!-- Always shows a header, even in smaller screens. -->
+<div class="mdl-layout mdl-js-layout mdl-layout--fixed-header mdl-layout--no-drawer-button">
+  <header class="mdl-layout__header">
+    <div class="mdl-layout__header-row">
+      <!-- Title -->
+      <span class="mdl-layout-title">EVENTS ATTENDANCE APP</span>
+      <!-- Add spacer, to align navigation to the right -->
+      <div class="mdl-layout-spacer"></div>
+      <!-- Navigation. We hide it in small screens. -->
+      <nav class="mdl-navigation mdl-layout--large-screen-only">
+
+	   <button class="mdl-button mdl-js-button mdl-button--raised mdl-button--accent mdl-js-ripple-effect">
+	   DOWNLOAD
+	   </button>
+	   
+      </nav>
+    </div>
+  </header>
+  <main class="mdl-layout__content">
+    <div class="page-content">
+	<!-- Your content goes here -->
+	<div id="divuid" class="mdl-shadow--2dp uid">
+	
+		
+				<!-- Simple Textfield -->
+				<div class="mdl-textfield mdl-js-textfield uid">
+				<input class="mdl-textfield__input" type="text" id='uid' oninput="check(this)">
+				<label class="mdl-textfield__label" style="color:rgba(63,81,181,1)">&nbsp; HID (cursor on me) </label>
+				</div>
+	
+	</div>
+	<br><br>
+	<!--CARD FOR INSTRUCTIONS-->
+	<div class="demo-card-widee mdl-card mdl-shadow--2dp">
+		<div class="mdl-card__title mdl-card--expand">
+			<h2 class="mdl-card__title-text">About the app</h2>
+		</div>
+		<div class="mdl-card__supporting-text">
+			Events Attendance App is intended to take attendance using HID cards. However, it also supports attendance through typing the name.
+		</div>
+	
+	
+		<div class="mdl-card__title mdl-card--expand">
+			<h2 class="mdl-card__title-text">Instructions</h2>
+		</div>
+		<div class="mdl-card__supporting-text">
+			<ul style="list-style-type:none;" class="demo-list-icon mdl-list">
+				<li class="mdl-list__item">
+					<span class="mdl-list__item-primary-content">
+					 <i class="material-icons mdl-list__item-icon color">album</i>
+						Make sure the device is connected to the reader.
+					</span>
+				</li>
+				<li class="mdl-list__item">
+					<span class="mdl-list__item-primary-content">
+					 <i class="material-icons mdl-list__item-icon color">album</i>
+						Attach HID card reader (to be issued from reception, ground floor, Ashoka University)
+					</span>	
+				</li>
+				<li class="mdl-list__item">
+					<span class="mdl-list__item-primary-content">
+					 <i class="material-icons mdl-list__item-icon color">album</i>
+					Make sure cursor is focused on 'HID' textbox
+					</span>
+				</li>
+				<li class="mdl-list__item">
+					<span class="mdl-list__item-primary-content">
+					 <i class="material-icons mdl-list__item-icon color">album</i>
+						Ask students to touch their cards on the card reader and wait till their name appears on screen
+					</span>	
+				</li>
+				<li class="mdl-list__item">
+					<span class="mdl-list__item-primary-content">
+					 <i class="material-icons mdl-list__item-icon color">album</i>
+						Add the details of the event and download the file.
+					</span>	
+				</li>
+			</ul>
+		</div>
+	</div>
+	
+	
+	<br>
+	<table class="mdl-data-table mdl-js-data-table  mdl-shadow--2dp">
+  <thead>
+    
+	<tr>
+      <th class="mdl-data-table__cell--non-numeric">Name</th>
+      <th>Time</th>
+      
+    </tr>
+  </thead>
+  <tbody id="list">
+    
+  </tbody>
+</table>
+
+	
+	
+	<div id='cast'>
+	Developed by Paras Bhattrai
+	</div>
+	
+	
+	<!-- Your content END-->
+	</div>
+  </main>
+</div>
+ 
+ 
+ 
+ 
+ 
+	
+ </body>
+ <script>
+ 
+ //test 
+ //bee67001fbff12e0
+  //var names=document.getElementById('names');
+  var tbody=document.getElementById('list');
+  var variable;
+  var xhr=null;
+  //var scroll=0;
+  var uid;
+  function check(variable){
+    if(variable.value.length==16)
+	{
+		uid=variable.value;
+		//alert(variable.value);
+		document.getElementById('uid').value='';
+		try{
+		 xhr=new XMLHttpRequest();
+		}
+		catch(e){
+		 xhr=new ActiveXObject("Microsoft.XMLHTTP");
+		}
+		if(xhr==null)
+		alert("Unable to run program. Connection Issue (Ajax request)");
+		
+		var url="attendance.php?uid="+uid;
+		xhr.onreadystatechange=handler;
+		xhr.open("GET",url,true);
+		xhr.send(null);
+		
+	}	
+	
+  }
+  function handler(){
+   if(xhr.readyState==4){
+		if(xhr.status==200){
+			var response=eval("("+ xhr.responseText +")");
+			var p=document.createElement('p');
+			
+			var td=document.createElement('td');
+			td.className="mdl-data-table__cell--non-numeric";
+			var tr=document.createElement('tr');
+			var td1=document.createElement('td');
+			if(response.name=='')
+			{
+				//p.innerHTML=' not found';
+				td.style.color="red";
+				td.innerHTML=uid;
+				td1.innerHTML=response.hour+":"+response.min;
+			}	
+			else
+				{
+				
+				//p.innerHTML=response.name+" "+response.hour+" "+response.min;
+				td.innerHTML=response.name; //cell containing name
+				td1.innerHTML=response.hour+":"+response.min; //cell containing timestamp
+ 				}
+			tbody.appendChild(tr);
+			tbody.lastChild.appendChild(td); //last row of the table, appending name element
+			tbody.lastChild.appendChild(td1); //last row of the table, appending name element
+			
+			//scroll to bottom
+			tbody.lastChild.scrollIntoView(); //last row of the table, appending name element
+			
+			
+			//names.appendChild(p);
+			//scroll++;
+			//alert(response.name);
+			//if(scroll==8)
+			//document.getElementById('uid').style.position="fixed";
+		}
+   }
+  }
+ 
+ </script>
+</html>
