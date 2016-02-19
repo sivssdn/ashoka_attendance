@@ -27,22 +27,22 @@
 .demo-card-widee.mdl-card {
   width: 98%;
   margin-left:1%;
-  margin-top:1%;
+  margin-top:2%;
   height:35vw;
 }
 #divuid{
   width:100%;
   margin-top:0%;
-  height:4vw;
+  height:5vw;
   display:block;
   position:fixed;  
   clear:both;
   z-index:10;
   background-color:#ffffff;
 }
-.mdl-textfield.mdl-js-textfield.uid{
- display:block;
- margin:auto;
+.mdl-textfield.mdl-js-textfield.uid,.mdl-textfield.mdl-js-textfield.muid{
+ display:inline-block;
+ margin-left:40%;
 }
 
 .material-icons.mdl-list__item-icon.color{
@@ -72,7 +72,7 @@ color:rgba(63,81,181,1);
       <!-- Navigation. We hide it in small screens. -->
       <nav class="mdl-navigation mdl-layout--large-screen-only">
 
-	   <button class="mdl-button mdl-js-button mdl-button--raised mdl-button--accent mdl-js-ripple-effect">
+	   <button class="mdl-button mdl-js-button mdl-button--raised mdl-button--accent mdl-js-ripple-effect" onclick="download();">
 	   DOWNLOAD
 	   </button>
 	   
@@ -84,12 +84,22 @@ color:rgba(63,81,181,1);
 	<!-- Your content goes here -->
 	<div id="divuid" class="mdl-shadow--2dp uid">
 	
-		
-				<!-- Simple Textfield -->
-				<div class="mdl-textfield mdl-js-textfield uid">
+				
+				<!-- Simple Textfield-->
+				<div class="mdl-textfield mdl-js-textfield uid" id="focustext">
+				<!--for HID reader-->
 				<input class="mdl-textfield__input" type="text" id='uid' oninput="check(this)">
-				<label class="mdl-textfield__label" style="color:rgba(63,81,181,1)">&nbsp; HID (cursor on me) </label>
+				<label class="mdl-textfield__label" style="color:rgba(63,81,181,1)" for="uid" id="uid_label">&nbsp; HID (cursor on me) </label>
+				
+				<!--for manual attendance-->
+				<input class="mdl-textfield__input" type="text" id='muid' onkeydown="manual(event)" style="display:none;">
+				<label class="mdl-textfield__label" style="color:rgba(63,81,181,1);display:none;" for="muid" id="muid_label">&nbsp; Manual attendance (cursor on me) </label>
 				</div>
+				
+				<!-- Primary-colored flat button -->
+				<button class="mdl-button mdl-js-button mdl-button--accent" style="float:right;display:inline-block;margin-top:1%;margin-right:2%;" id="manualuid" onclick="toggleid();">
+				MANUAL ATTENDANCE
+				</button>
 	
 	</div>
 	<br><br>
@@ -158,7 +168,10 @@ color:rgba(63,81,181,1);
   </tbody>
 </table>
 
+	<!--Hidden form to submit all the data to server-->
+	<form hidden method="post" action="download.php" id='hiddenform'>
 	
+	</form>
 	
 	<div id='cast'>
 	Developed by Paras Bhattrai
@@ -182,12 +195,16 @@ color:rgba(63,81,181,1);
  //bee67001fbff12e0
   //var names=document.getElementById('names');
   var tbody=document.getElementById('list');
-  var variable;
+  var variable; //as parameter in check()
+  var variable1; //as parameter in manual()
   var xhr=null;
+  //for using to make form submitting name and time for download to attendance.php
+  var fname=1,ftime=1;
   //var scroll=0;
   var uid;
+  var toggle=1;//for switching between manual and hid attendance mode. Toggles textbox
   function check(variable){
-    if(variable.value.length==16)
+    if(variable.value.length==16)//read either from HID textfield(uid) or Manual textfield(muid)
 	{
 		uid=variable.value;
 		//alert(variable.value);
@@ -213,25 +230,39 @@ color:rgba(63,81,181,1);
    if(xhr.readyState==4){
 		if(xhr.status==200){
 			var response=eval("("+ xhr.responseText +")");
-			var p=document.createElement('p');
+			//var p=document.createElement('p');
 			
 			var td=document.createElement('td');
 			td.className="mdl-data-table__cell--non-numeric";
 			var tr=document.createElement('tr');
 			var td1=document.createElement('td');
+			var formname=document.createElement('input');
+			formname.name='n'+fname;
+			var formtime=document.createElement('input');
+			formtime.name='t'+fname;
+			fname++;ftime++;
+			
 			if(response.name=='')
 			{
-				//p.innerHTML=' not found';
+				//to display data in the current page, if no data is received for a person
 				td.style.color="red";
 				td.innerHTML=uid;
 				td1.innerHTML=response.hour+":"+response.min;
+				
+				//to prepare form input fields
+				formname.value=uid;
+				formtime.value=response.hour+":"+response.min;
 			}	
 			else
 				{
 				
-				//p.innerHTML=response.name+" "+response.hour+" "+response.min;
+				//to display data in current page, if person exists in db
 				td.innerHTML=response.name; //cell containing name
 				td1.innerHTML=response.hour+":"+response.min; //cell containing timestamp
+				
+				//to prepare form input fields
+				formname.value=response.name;
+				formtime.value=response.hour+":"+response.min;
  				}
 			tbody.appendChild(tr);
 			tbody.lastChild.appendChild(td); //last row of the table, appending name element
@@ -240,7 +271,9 @@ color:rgba(63,81,181,1);
 			//scroll to bottom
 			tbody.lastChild.scrollIntoView(); //last row of the table, appending name element
 			
-			
+			//to append data in hidden form for transfer to server--
+			document.getElementById('hiddenform').appendChild(formname);
+			document.getElementById('hiddenform').appendChild(formtime);
 			//names.appendChild(p);
 			//scroll++;
 			//alert(response.name);
@@ -250,5 +283,76 @@ color:rgba(63,81,181,1);
    }
   }
  
+	function download(){
+	document.getElementById('hiddenform').submit();
+	}
+	
+	//to toggle between manual and HID attendendance mode
+	function toggleid(){
+		if(toggle==1)
+		{
+			//switch to manual mode
+			document.getElementById('muid').style.display="inline-block";
+			document.getElementById('muid_label').style.display="inline-block";
+			document.getElementById('uid').style.display="none";
+			document.getElementById('uid_label').style.display="none";
+			
+			//mdl focus loses when dom elements are changed dynamically
+			//to preserve the focus effect, isFocused class is to be added to the parent element, which is done below
+			document.getElementById('focustext').className="mdl-textfield mdl-js-textfield uid is-upgraded is-focused";
+			
+			document.getElementById('muid').focus();
+			toggle=0;	
+		}
+		else
+		{
+			//switch to hid mode
+			document.getElementById('uid').style.display="inline-block";
+			document.getElementById('uid_label').style.display="inline-block";
+			document.getElementById('muid').style.display="none";
+			document.getElementById('muid_label').style.display="none";
+			
+			document.getElementById('uid').focus();
+			toggle=1;
+		}
+	}
+	var counter=0; //for manual()
+	function manual(variable1){
+		if(counter==0)
+		document.getElementById('muid_label').style.display="none";
+		counter++;
+		if(variable1.which==13) //if enter is pressed then append the name in the list
+		{
+			var td=document.createElement('td');
+			td.className="mdl-data-table__cell--non-numeric";
+			var tr=document.createElement('tr');
+			var td1=document.createElement('td');
+			var formname=document.createElement('input');
+			formname.name='n'+fname;
+			var formtime=document.createElement('input');
+			formtime.name='t'+fname;
+			fname++;ftime++;
+				td.innerHTML=document.getElementById('muid').value; //cell containing name
+				td1.innerHTML="--:--"; //cell containing timestamp
+				
+				//to prepare form input fields
+				formname.value=document.getElementById('muid').value;
+				formtime.value="--:--";
+			//check(document.getElementById('muid').value);
+			
+			
+			tbody.appendChild(tr);
+			tbody.lastChild.appendChild(td); //last row of the table, appending name element
+			tbody.lastChild.appendChild(td1); //last row of the table, appending name element
+			
+			//scroll to bottom
+			tbody.lastChild.scrollIntoView(); //last row of the table, appending name element
+			
+			//to append data in hidden form for transfer to server--
+			document.getElementById('hiddenform').appendChild(formname);
+			document.getElementById('hiddenform').appendChild(formtime);
+			
+		}
+	}
  </script>
 </html>
