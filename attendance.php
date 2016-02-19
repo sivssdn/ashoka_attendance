@@ -3,7 +3,7 @@
  header("Content-type:application/json");
   
  $uid=htmlspecialchars($_GET['uid']);
- $db=new PDO("mysql:host=localhost;dbname=ugs","root","");
+ $db=new PDO("mysql:host=localhost;dbname=ugs","root","server");
   $data=$db->prepare("SELECT `name` FROM `ashoka_ugs` WHERE `card_number` LIKE '{$uid}';");
   $data->execute();
   $result=$data->fetch();
