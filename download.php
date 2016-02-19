@@ -17,7 +17,7 @@
 		header('Cache-Control: max-age=0');
 		
 			
-			require_once '.\PHPExcel-1.8\PHPExcel-1.8\Classes\PHPExcel\IOFactory.php';
+			require_once($_SERVER['DOCUMENT_ROOT'].'/PHPExcel-1.8/PHPExcel-1.8/Classes/PHPExcel/IOFactory.php');
 			//$obj=PHPExcel_IOFactory::load("template.xlsx");
 			$obj=new PHPExcel();
 			$obj->setActiveSheetIndex(0); //set first sheet as active
