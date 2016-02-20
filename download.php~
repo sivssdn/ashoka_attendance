@@ -47,7 +47,6 @@
 			ob_end_clean();
 //			$objectWriter->save("{$name}");
 				//for auto download excel file
-			//it requires some physical space to save before it outputs the file, hence we have specied the location on server to save excel file and then download
 			$objectWriter->save($_SERVER['DOCUMENT_ROOT'].'/attendance/files/'.$name.'');
 
 			//to output it to user 
